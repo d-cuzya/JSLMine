@@ -3,15 +3,17 @@ import fs from 'fs';
 
 let mainWindow;
 let loadingWindow;
+let createContainer 
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function createLoadWindow() {
+async function createLoadWindow() {
   loadingWindow = new BrowserWindow({
     width: 200,
     height: 200,
+    show: false,
   });
 
   loadingWindow.loadFile('./src/gui/loading.html');
@@ -28,32 +30,41 @@ async function init() {
     }
   });
 
-  await sleep(5000);
+  await sleep(2500);
 }
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    show: false,
   });
 
   mainWindow.loadFile('./src/gui/index.html');
   mainWindow.setMenu(null);
-  mainWindow.once('ready-to-show', () => {
-    loadingWindow.close(); // Закрываем окно загрузки
-    mainWindow.show(); // Показываем основное окно
-  });
+//   mainWindow.once('ready-to-show', () => {
+//     loadingWindow.close();
+    mainWindow.show();
+//   });
 }
 
-// Главная функция (сделаем её асинхронной)
+function createCreateContainer() {
+    loadingWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        show: false
+      });
+    
+      loadingWindow.loadFile('./src/gui/createContainer.html');
+      loadingWindow.setMenu(null);
+}
 async function main() {
-  await app.whenReady(); // Ждём готовности приложения
-  createLoadWindow(); // Создаём окно загрузки
-
-  await init(); // Выполняем инициализацию (загрузку данных и задержку)
-  
-  createMainWindow(); // Создаём основное окно
+  await app.whenReady();
+  createLoadWindow();
+  createCreateContainer();
+  await init(); 
+  await loadingWindow.close();
+  createMainWindow();
 }
 
-// Запуск приложения
 main();
