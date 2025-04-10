@@ -1,0 +1,34 @@
+# Игнорировать файлы Node.js
+node_modules/
+
+# Игнорировать скомпилированные файлы Electron
+**/dist/
+**/build/
+
+# Игнорировать скомпилированные бинарные файлы Electron (например, для Windows, Linux и Mac)
+**/electron-app/
+**/electron-app-win32/
+**/electron-app-linux/
+**/electron-app-darwin/
+
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.env
+
+
+.DS_Store
+Thumbs.db
+
+*.apk
+*.exe
+*.dmg
+*.app
+*.msi
+
+# Игнорировать временные файлы
+*.swp
+*.swo
