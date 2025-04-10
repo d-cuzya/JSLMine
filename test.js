@@ -35,12 +35,26 @@ async function downloadLibraries(id) {
         // console.log();
     });
 }
+async function downloadAssets(id) {
+    const versionJson = JSON.parse(await fs.readFile(`./src/backend/versions/${id}/${id}.json`, 'utf8'));
+    const assetsJson =  await (await fetch(versionJson.assetIndex.url)).json();
+    await fs.writeFile(`./src/backend/versions/${id}/assets.json`, JSON.stringify(assetsJson), 'utf8');
+    // console.log(assetsJson)
+    await fs.mkdir(`./src/backend/versions/${id}/assets/`, { recursive: true });
+    for(const [_, value] of Object.entries(assetsJson.objects)) {
 
+        await download(`https://resources.download.minecraft.net/${value.hash.substring(0,2)}/${value.hash}`, `./src/backend/versions/${id}/assets`);
+        console.log("Asset was download.");
+    }
+    console.log("Assets download was secuess!");
+}
 // id - version (ex: 1.12.2 - is id)
 async function main() {    
     await initVersionManifest();
     await downloadJsonByUrl((await getInfoAboutVersion(await getLastRelease())).url);
-    await downloadLibraries(await getLastRelease());
+    // await downloadLibraries(await getLastRelease());
+    await downloadAssets(await getLastRelease());
+    // await startClient(id);
 }
 
 main()
