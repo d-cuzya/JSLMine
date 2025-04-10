@@ -22,7 +22,7 @@ async function createLoadWindow() {
 
 async function init() {
   const tmp = await fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json');
-  const data = await tmp.json();
+  const data = await tmp.text();
 
   fs.writeFile('./src/backend/version_manifest.json', JSON.stringify(data), (err) => {
     if (err) {

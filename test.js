@@ -19,14 +19,25 @@ async function getInfoAboutVersion(id) {
     });
     return res;
 }
-async function downloadFileByUrl(url) {
+async function downloadJsonByUrl(url) {
     let fileName = url.substring(url.lastIndexOf('/')+ 1);
-    await fs.mkdir(`./src/backend/versions/${fileName}`, { recursive: true });
+    let fileContent = await fetch(url);
+    await fs.mkdir(`./src/backend/versions/${fileName.replace('.json','')}`, { recursive: true });
+    await fs.writeFile(`./src/backend/versions/${fileName.replace('.json','')}/${fileName}`, Buffer.from(await fileContent.arrayBuffer()), 'utf8');
+}
+async function downloadLibraries(id) {
+    const versionJson = JSON.parse(await fs.readFile(`./src/backend/versions/${id}/${id}.json`, 'utf8'));
+    await fs.mkdir(`./src/backend/versions/${id}/libraries/`, { recursive: true });
+    await versionJson.libraries.forEach((element) => {
+        console.log(element.downloads.artifact.url);
+    });
 }
 
+// id - version (ex: 1.12.2 - is id)
 async function main() {    
     await initVersionManifest();
-    await downloadFileByUrl((await getInfoAboutVersion(await getLastRelease())).url);    
+    await downloadJsonByUrl((await getInfoAboutVersion(await getLastRelease())).url);
+    await downloadLibraries(await getLastRelease());
 }
 
 main()
