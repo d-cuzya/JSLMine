@@ -1,5 +1,7 @@
 import fs from 'fs/promises';
 import exec from 'child_process'
+import download from 'download';
+
 let version_manifest;
 
 async function initVersionManifest() {
@@ -29,7 +31,8 @@ async function downloadLibraries(id) {
     const versionJson = JSON.parse(await fs.readFile(`./src/backend/versions/${id}/${id}.json`, 'utf8'));
     await fs.mkdir(`./src/backend/versions/${id}/libraries/`, { recursive: true });
     await versionJson.libraries.forEach((element) => {
-        console.log(element.downloads.artifact.url);
+        download(element.downloads.artifact.url, `./src/backend/versions/${id}/libraries`);
+        // console.log();
     });
 }
 
