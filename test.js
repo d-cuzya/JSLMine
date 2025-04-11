@@ -30,9 +30,15 @@ async function downloadJsonByUrl(url) {
 async function downloadLibraries(id) {
     const versionJson = JSON.parse(await fs.readFile(`./src/backend/versions/${id}/${id}.json`, 'utf8'));
     await fs.mkdir(`./src/backend/versions/${id}/libraries/`, { recursive: true });
+    console.log("versionJson: ");
+    console.log(versionJson);
     await versionJson.libraries.forEach((element) => {
-        download(element.downloads.artifact.url, `./src/backend/versions/${id}/libraries`);
-        // console.log();
+        if (element.downloads.artifact == undefined) {
+            console.log("UndefElement:");
+            console.log(element);
+        } else {
+            download(element.downloads.artifact.url, `./src/backend/versions/${id}/libraries`);
+        }
     });
 }
 async function downloadAssets(id) {
@@ -41,22 +47,37 @@ async function downloadAssets(id) {
     await fs.writeFile(`./src/backend/versions/${id}/assets.json`, JSON.stringify(assetsJson), 'utf8');
     // console.log(assetsJson)
     await fs.mkdir(`./src/backend/versions/${id}/assets/`, { recursive: true });
-    for(const [_, value] of Object.entries(assetsJson.objects)) {
+    const tmp = Object.entries(assetsJson.objects);
+    let count = 0;
+    for(const [_, value] of tmp) {
 
         await download(`https://resources.download.minecraft.net/${value.hash.substring(0,2)}/${value.hash}`, `./src/backend/versions/${id}/assets`);
-        console.log("Asset was download.");
+        console.log(`Asset: ${count}/${tmp.length}`);
+        count++;
     }
     console.log("Assets download was secuess!");
 }
-// id - version (ex: 1.12.2 - is id)
+async function downloadClient(id) {
+    const versionJson = JSON.parse(await fs.readFile(`./src/backend/versions/${id}/${id}.json`, 'utf8'));
+    await download(versionJson.downloads.client.url, `./src/backend/versions/${id}/`);
+}
+async function startClient(id) {
+    exec.exec(`"C:\\Program Files (x86)\\Java\\jre1.8.0_431\\bin\\java.exe" -Xmx4G -Xms1G -cp "./src/backend/versions/${id}/libraries/*;./src/backend/versions/${id}/client.jar" net.minecraft.client.main.Main --username "nicknadme" --version ${id} --gameDir /.minecraft  --assetDir "./src/backend/versions/${id}/assets/*" --assetIndex 24 --accessToken 0`, (err, stdout, stderr) => {;
+        console.log(`err: ${err}`);
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+    });
+}
+// id - version (ex: '1.12.2' - is id)
 async function main() {    
     await initVersionManifest();
-    await downloadJsonByUrl((await getInfoAboutVersion(await getLastRelease())).url);
-    // await downloadLibraries(await getLastRelease());
-    await downloadAssets(await getLastRelease());
-    // await startClient(id);
+    // const version = await getLastRelease();
+    const version = "1.12.2";
+    await downloadJsonByUrl((await getInfoAboutVersion(version)).url);
+    await downloadLibraries(version);
+    // await downloadAssets(version);
+    // await downloadClient(version);
+    await startClient(version);
 }
 
 main()
-
-// java -Xmx2G -cp "client.jar:libraries/*" -Djava.library.path=./natives net.minecraft.client.main.Main --username Player --version 1.21.5 --gameDir ~/.minecraft --assetsDir ~/.minecraft/assets --assetIndex 24
