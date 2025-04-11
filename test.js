@@ -34,7 +34,9 @@ async function downloadLibraries(id) {
     // console.log(versionJson);
     await versionJson.libraries.forEach((element) => {
         if (element.downloads.artifact == undefined) {
-            console.log(element.downloads.classifiers);
+            Object.entries(element.downloads.classifiers).forEach((tmp) => {
+                console.log(tmp);
+            });
             // console.log(element.downloads.classifiers);
         } else {
             // download(element.downloads.artifact.url, `./src/backend/versions/${id}/libraries`);
