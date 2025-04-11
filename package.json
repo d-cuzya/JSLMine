@@ -13,6 +13,7 @@
     "electron": "^35.1.5"
   },
   "dependencies": {
-    "download": "^8.0.0"
+    "download": "^8.0.0",
+    "unzipper": "^0.12.3"
   }
 }
